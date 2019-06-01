@@ -64,7 +64,7 @@ public:
   
   Activites readActivites(void);
 
-  Vector lowPassFilter(Vector vector, float alpha = 0.5);
+  // Vector lowPassFilter(Vector vector, float alpha = 0.5);
 
   void setTapThreshold(float threshold);
   float getTapThreshold(void);
@@ -100,6 +100,8 @@ public:
   void setActivityZ(bool state);
   bool getActivityZ(void);
   void setActivityXYZ(bool state);
+  bool getActivityAC(void);
+  void setActivityAC(bool state);
 
   void setInactivityX(bool state);
   bool getInactivityX(void);
@@ -108,6 +110,8 @@ public:
   void setInactivityZ(bool state);
   bool getInactivityZ(void);
   void setInactivityXYZ(bool state);
+  bool getInactivityAC(void);
+  void setInactivityAC(bool state);
 
   void setTapDetectionX(bool state);
   bool getTapDetectionX(void);
@@ -117,11 +121,24 @@ public:
   bool getTapDetectionZ(void);
   void setTapDetectionXYZ(bool state);
 
+  void setPowerConfig(byte cnfg);
+  byte getPowerConfig(void);
+
   void useInterrupt(adxl345_int_t interrupt);
+  
+  void writeRegister8(uint8_t reg, uint8_t value);
+  uint8_t fastRegister8(uint8_t reg);
+  uint8_t readRegister8(uint8_t reg);
+  int16_t readRegister16(uint8_t reg);
+  void writeRegisterBit(uint8_t reg, uint8_t pos, bool state);
+  bool readRegisterBit(uint8_t reg, uint8_t pos);
 
   private:
   Activites a;
   range_t _range;
+
+
+
 
 };
 

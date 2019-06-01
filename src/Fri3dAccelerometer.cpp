@@ -340,6 +340,16 @@ Fri3dAccelerometer::setActivityXYZ(bool state)
     writeRegister(ADXL345_REG_ACT_INACT_CTL, value);
 }
 
+bool 
+Fri3dAccelerometer::getActivityAC(void){
+    return readRegisterBit(ADXL345_REG_ACT_INACT_CTL, 7);
+}
+
+void 
+Fri3dAccelerometer::setActivityAC(bool state)
+{
+  writeRegisterBit(ADXL345_REG_ACT_INACT_CTL, 7, state);
+}
 
 void 
 Fri3dAccelerometer::setInactivityX(bool state) 
@@ -395,6 +405,17 @@ Fri3dAccelerometer::setInactivityXYZ(bool state)
     writeRegister(ADXL345_REG_ACT_INACT_CTL, value);
 }
 
+bool 
+Fri3dAccelerometer::getInActivityAC(void){
+    return readRegisterBit(ADXL345_REG_ACT_INACT_CTL, 7);
+}
+
+void 
+Fri3dAccelerometer::setInActivityAC(bool state)
+{
+  writeRegisterBit(ADXL345_REG_ACT_INACT_CTL, 7, state);
+}
+
 void 
 Fri3dAccelerometer::setTapDetectionX(bool state)
 {
@@ -440,15 +461,26 @@ Fri3dAccelerometer::setTapDetectionXYZ(bool state)
 
     if (state)
     {
-	value |= 0b00000111;
+	    value |= 0b00000111;
     } else
     {
-	value &= 0b11111000;
+	    value &= 0b11111000;
     }
 
     writeRegister(ADXL345_REG_TAP_AXES, value);
 }
 
+void 
+Fri3dAccelerometer::setPowerConfig(byte cnfg)
+{
+  writeRegister(ADXL345_REG_POWER_CTL,cnfg);
+}
+
+byte 
+Fri3dAccelerometer::getPowerConfig(void)
+{
+  return readRegister(ADXL345_REG_POWER_CTL);
+}
 
 void 
 Fri3dAccelerometer::useInterrupt(adxl345_int_t interrupt)
@@ -488,6 +520,97 @@ Fri3dAccelerometer::readActivites(void)
     a.isTapOnZ = ((data >> 0) & 1);
 
     return a;
+}
+
+// Write byte to register
+void Fri3dAccelerometer::writeRegister8(uint8_t reg, uint8_t value)
+{
+    Wire.beginTransmission(ADXL345_ADDRESS);
+    #if ARDUINO >= 100
+        Wire.write(reg);
+        Wire.write(value);
+    #else
+        Wire.send(reg);
+        Wire.send(value);
+    #endif
+    Wire.endTransmission();
+}
+
+// Read byte to register
+uint8_t Fri3dAccelerometer::fastRegister8(uint8_t reg)
+{
+    uint8_t value;
+    Wire.beginTransmission(ADXL345_ADDRESS);
+    #if ARDUINO >= 100
+        Wire.write(reg);
+    #else
+        Wire.send(reg);
+    #endif
+    Wire.endTransmission();
+
+    Wire.requestFrom(ADXL345_ADDRESS, 1);
+    #if ARDUINO >= 100
+        value = Wire.read();
+    #else
+        value = Wire.receive();
+    #endif;
+    Wire.endTransmission();
+
+    return value;
+}
+
+// Read byte from register
+uint8_t Fri3dAccelerometer::readRegister8(uint8_t reg)
+{
+    uint8_t value;
+    Wire.beginTransmission(ADXL345_ADDRESS);
+    #if ARDUINO >= 100
+        Wire.write(reg);
+    #else
+        Wire.send(reg);
+    #endif
+    Wire.endTransmission();
+
+    Wire.beginTransmission(ADXL345_ADDRESS);
+    Wire.requestFrom(ADXL345_ADDRESS, 1);
+    while(!Wire.available()) {};
+    #if ARDUINO >= 100
+        value = Wire.read();
+    #else
+        value = Wire.receive();
+    #endif;
+    Wire.endTransmission();
+
+    return value;
+}
+
+// Read word from register
+int16_t Fri3dAccelerometer::readRegister16(uint8_t reg)
+{
+    int16_t value;
+    Wire.beginTransmission(ADXL345_ADDRESS);
+    #if ARDUINO >= 100
+        Wire.write(reg);
+    #else
+        Wire.send(reg);
+    #endif
+    Wire.endTransmission();
+
+    Wire.beginTransmission(ADXL345_ADDRESS);
+    Wire.requestFrom(ADXL345_ADDRESS, 2);
+    while(!Wire.available()) {};
+    #if ARDUINO >= 100
+        uint8_t vla = Wire.read();
+        uint8_t vha = Wire.read();
+    #else
+        uint8_t vla = Wire.receive();
+        uint8_t vha = Wire.receive();
+    #endif;
+    Wire.endTransmission();
+
+    value = vha << 8 | vla;
+
+    return value;
 }
 
 void 
